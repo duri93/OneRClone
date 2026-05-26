@@ -409,9 +409,13 @@ void MainWindow::onTrayMenuAboutToShow()
 void MainWindow::onTrayActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::DoubleClick) {
-        show();
-        raise();
-        activateWindow();
+        if (isVisible()) {
+            hide();
+        } else {
+            show();
+            raise();
+            activateWindow();
+        }
     }
 }
 

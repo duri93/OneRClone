@@ -7,7 +7,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Svg)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Svg Network)
 
 set(SOURCES
     src/main.cpp
@@ -47,7 +47,7 @@ target_link_libraries(SimpleRCloneMountGui
     PRIVATE
         Qt6::Core
         Qt6::Widgets
+        Qt6::Network
 )
-
 target_include_directories(SimpleRCloneMountGui PRIVATE src)
 
