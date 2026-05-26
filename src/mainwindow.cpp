@@ -8,6 +8,7 @@
 #include <QUuid>
 #include <QListView>
 #include <QSettings>
+#include <QPainter>
 
 // ---------------------------------------------------------------------------
 // Constructor / Destructor
@@ -65,6 +66,9 @@ MainWindow::MainWindow(QWidget* parent)
             if (svc) svc->start();
         }
     }
+
+    // setup tray
+    setupTray();
 }
 
 MainWindow::~MainWindow()
@@ -74,9 +78,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-    // Persist settings on close
-    m_settings.save();
-    event->accept();
+    m_settings.save();    // save settings
+    hide();               // hide window, keep app running
+    event->ignore();      // don't propagate the close
 }
 
 // ---------------------------------------------------------------------------
@@ -121,7 +125,7 @@ void MainWindow::saveUiToSettings()
     // register or unregister startup
     QSettings reg("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     if(ui->startupLaunch->isChecked()){
-        reg.setValue("SRCMG", QCoreApplication::applicationFilePath().replace('/', '\\'));
+        reg.setValue("SRCMG", QCoreApplication::applicationFilePath().replace('/', '\\') + " --tray");
     }else{
         reg.remove("SRCMG");
     }
@@ -315,3 +319,101 @@ void MainWindow::onServiceOutputLine(const QString& id, const QString& line)
     ui->output->append(line);
 
 }
+
+// ---------------------------------------------------------------------------
+// Tray icon
+// ---------------------------------------------------------------------------
+void MainWindow::setupTray()
+{
+    m_trayIcon = new QSystemTrayIcon(this);
+
+    // Placeholder icon — replace with your actual app icon
+    m_trayIcon->setIcon(QIcon(":/assets/favicon.svg"));
+    m_trayIcon->setToolTip("Simple RClone Mount GUI");
+
+    m_trayMenu  = new QMenu(this);
+    m_trayOpen  = m_trayMenu->addAction("Open");
+    m_trayMenu->addSeparator();
+    // Service actions are inserted here dynamically (see onTrayMenuAboutToShow)
+    m_trayMenu->addSeparator();
+    m_trayClose = m_trayMenu->addAction("Quit");
+
+    connect(m_trayOpen,  &QAction::triggered,         this, &MainWindow::show);
+    connect(m_trayClose, &QAction::triggered,         qApp, &QApplication::quit);
+    connect(m_trayMenu,  &QMenu::aboutToShow,         this, &MainWindow::onTrayMenuAboutToShow);
+    connect(m_trayIcon,  &QSystemTrayIcon::activated, this, &MainWindow::onTrayActivated);
+
+    m_trayIcon->setContextMenu(m_trayMenu);
+    m_trayIcon->show();
+}
+QIcon MainWindow::dotIcon(QColor color)
+{
+    QPixmap pm(16, 16);
+    pm.fill(Qt::transparent);
+    QPainter p(&pm);
+    p.setRenderHint(QPainter::Antialiasing);
+    p.setBrush(color);
+    p.setPen(Qt::NoPen);
+    p.drawEllipse(2, 2, 12, 12);
+    return QIcon(pm);
+}
+void MainWindow::onTrayMenuAboutToShow()
+{
+    // Remove all actions between the first separator and the last separator
+    // (i.e. the dynamically added service actions from last time)
+    QList<QAction*> actions = m_trayMenu->actions();
+    QAction* lastSep  = nullptr;
+    bool inside = false;
+    for (QAction* a : actions) {
+        if (a->isSeparator()) {
+            lastSep = a;
+            inside = !inside;
+        }else if (inside){
+            m_trayMenu->removeAction(a);
+            delete a;
+        }
+    }
+
+    // Re-insert current service actions before lastSep
+    for (const ServiceSpec& spec : m_settings.services()) {
+        MountService* svc = m_model.serviceById(spec.id);
+        if (!svc) continue;
+
+        QColor dot;
+        switch (svc->status()) {
+        case ServiceStatus::Stopped:  dot = QColor(0xAA, 0xAA, 0xAA); break;
+        case ServiceStatus::Starting: dot = QColor(0xFF, 0xCC, 0x00); break;
+        case ServiceStatus::Stopping: dot = QColor(0xFF, 0xCC, 0x00); break;
+        case ServiceStatus::Running:  dot = QColor(0x22, 0xBB, 0x22); break;
+        case ServiceStatus::Errored:  dot = QColor(0xDD, 0x22, 0x22); break;
+        }
+
+        QAction* act = new QAction(dotIcon(dot), spec.name, m_trayMenu);
+
+        // Toggle on click
+        connect(act, &QAction::triggered, this, [this, id = spec.id]() {
+            MountService* s = m_model.serviceById(id);
+            if (!s) return;
+            if (s->status() == ServiceStatus::Running ||
+                s->status() == ServiceStatus::Starting)
+                s->stop();
+            else
+                s->start();
+        });
+
+        m_trayMenu->insertAction(lastSep, act);
+    }
+}
+
+
+void MainWindow::onTrayActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    if (reason == QSystemTrayIcon::DoubleClick) {
+        show();
+        raise();
+        activateWindow();
+    }
+}
+
+
+

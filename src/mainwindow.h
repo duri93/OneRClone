@@ -5,6 +5,9 @@
 
 #include <QMainWindow>
 #include <QString>
+#include <QSystemTrayIcon>
+#include <QMenu>
+#include <QAction>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -45,6 +48,10 @@ private slots:
     void onServiceStatusChanged(const QString& id, ServiceStatus status);
     void onServiceOutputLine(const QString& id, const QString& line);
 
+    // Tray icon
+    void onTrayActivated(QSystemTrayIcon::ActivationReason reason);
+    void onTrayMenuAboutToShow();    // rebuilds service list in menu
+
 private:
     // Populate settings form from m_settings.shared()
     void loadSettingsToUi();
@@ -53,6 +60,7 @@ private:
 
     // Show a service's data in the details tab and switch to it
     void openDetails(const QString& serviceId);
+
     // Clear the details tab (no service selected)
     void clearDetails();
 
@@ -65,4 +73,15 @@ private:
 
     // Id of the service currently shown in the details tab
     QString m_currentDetailId;
+
+// tray icon
+private:
+    void setupTray();
+    QIcon dotIcon(QColor color);    // generates a small colored-dot icon
+
+    QSystemTrayIcon* m_trayIcon    = nullptr;
+    QMenu*           m_trayMenu    = nullptr;
+    QAction*         m_trayOpen    = nullptr;
+    QAction*         m_trayClose   = nullptr;
+    // service actions are rebuilt dynamically in onTrayMenuAboutToShow
 };
