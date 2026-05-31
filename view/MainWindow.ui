@@ -74,7 +74,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabList">
        <attribute name="title">
@@ -228,6 +228,9 @@
              <number>0</number>
             </property>
             <property name="maxVisibleItems">
+             <number>4</number>
+            </property>
+            <property name="maxCount">
              <number>4</number>
             </property>
             <item>

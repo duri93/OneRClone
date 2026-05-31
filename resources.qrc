@@ -3,20 +3,21 @@
         <file>resources/app.ico</file>
         <file>resources/favicon.svg</file>
         <file>resources/logo.svg</file>
-        <file>resources/icons/copy_Errored.svg</file>
-        <file>resources/icons/copy_Running.svg</file>
-        <file>resources/icons/copy_Starting.svg</file>
-        <file>resources/icons/copy_Stopped.svg</file>
-        <file>resources/icons/copy_Stopping.svg</file>
-        <file>resources/icons/mount_Errored.svg</file>
-        <file>resources/icons/mount_Running.svg</file>
-        <file>resources/icons/mount_Starting.svg</file>
-        <file>resources/icons/mount_Stopped.svg</file>
-        <file>resources/icons/mount_Stopping.svg</file>
-        <file>resources/icons/sync_Errored.svg</file>
-        <file>resources/icons/sync_Running.svg</file>
-        <file>resources/icons/sync_Starting.svg</file>
-        <file>resources/icons/sync_Stopped.svg</file>
-        <file>resources/icons/sync_Stopping.svg</file>
+        <file>resources/icons/_stopped.svg</file>
+        <file>resources/icons/copy_errored.svg</file>
+        <file>resources/icons/copy_running.svg</file>
+        <file>resources/icons/copy_starting.svg</file>
+        <file>resources/icons/copy_stopped.svg</file>
+        <file>resources/icons/copy_stopping.svg</file>
+        <file>resources/icons/mount_errored.svg</file>
+        <file>resources/icons/mount_running.svg</file>
+        <file>resources/icons/mount_starting.svg</file>
+        <file>resources/icons/mount_stopped.svg</file>
+        <file>resources/icons/mount_stopping.svg</file>
+        <file>resources/icons/sync_errored.svg</file>
+        <file>resources/icons/sync_running.svg</file>
+        <file>resources/icons/sync_starting.svg</file>
+        <file>resources/icons/sync_stopped.svg</file>
+        <file>resources/icons/sync_stopping.svg</file>
     </qresource>
 </RCC>

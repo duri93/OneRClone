@@ -36,10 +36,8 @@ JobWidget::~JobWidget() {
     delete ui;
 }
 const QString JobWidget::icon() const{
-    QString str = QString(":/resources/icons/%1_%2.svg")
-                      .arg(m_job->type(), m_job->statusString());
-
-    qDebug() << str;
+    QString str = QString(":/resources/icons/%1_%2.svg").arg(m_job->type(), m_job->statusString());
+    str = str.toLower();
 
     return str;
 }
@@ -86,8 +84,13 @@ void JobWidget::onSpecChange(){
         ui->button2->show();
     }
 
+    bool validType = m_job->type() != "";
+    ui->button1->setEnabled(validType);
+    ui->button2->setEnabled(validType);
+
     ui->status->setFont(QFont("Arial", 8));
     ui->bytes->setFont(QFont("Arial", 8));
+    ui->speed->setFont(QFont("Arial", 8));
     ui->percent->setFont(QFont("Arial", 8));
     ui->eta->setFont(QFont("Arial", 8));
 
@@ -131,7 +134,8 @@ void JobWidget::onStatusChange(){
     setProgressVisibility();
 }
 void JobWidget::onProgress(){
-    ui->bytes->setText(m_job->progress().bytes + "[" + m_job->progress().speed + "]");
+    ui->bytes->setText(m_job->progress().bytes);
+    ui->speed->setText(m_job->progress().speed);
     ui->percent->setText(QString::number(m_job->progress().percent) + "%");
     ui->eta->setText(m_job->progress().eta);
 
@@ -143,10 +147,18 @@ void JobWidget::setProgressVisibility(){
     if(m_job->type() != "mount" && active){
         ui->progress->show();
         ui->bytes->show();
+        ui->speed->show();
         ui->percent->show();
         ui->eta->show();
     }else{
+        ui->bytes->setText("");
+        ui->speed->setText("");
+        ui->percent->setText("");
+        ui->eta->setText("");
+        ui->progress->setValue(0);
+
         ui->progress->hide();
+        ui->speed->hide();
         ui->bytes->hide();
         ui->percent->hide();
         ui->eta->hide();

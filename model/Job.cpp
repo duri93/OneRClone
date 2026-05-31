@@ -2,6 +2,10 @@
 
 #include "../model/Config.h"
 #include <QUuid>
+#include <QTimer>
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
 Job::Job(SharedSettings* shared, QObject* parent)
     : QObject(parent), m_shared(shared){
@@ -68,28 +72,28 @@ void Job::start(bool swapSides)
     if(m_type == "mount"){
         args << "mount" << m_remote << m_local;
         if (m_readOnly) args << "--read-only";
-    }else if(!swapSides){
-        args << m_type << m_local << m_remote;
-        args << "--progress";
+        args << "--vfs-cache-mode"              << m_shared->cacheMode();
+        args << "--vfs-cache-max-size"          << QString::number(m_shared->cacheMaxSize())       + "G";
+        args << "--vfs-cache-min-free-space"    << QString::number(m_shared->cacheMinFreeSpace())  + "G";
+        args << "--vfs-cache-max-age"           << QString::number(m_shared->cacheMaxAge())        + "h";
+        args << "--vfs-read-chunk-size"         << QString::number(m_shared->readChunkSize())      + "M";
+        args << "--vfs-read-chunk-size-limit"   << QString::number(m_shared->readChunkSizeLimit()) + "M";
     }else{
-        args << m_type << m_remote << m_local;
-        args << "--progress";
+        args << m_type;
+        if(swapSides){
+            args << m_remote << m_local;
+        }else{
+            args << m_local << m_remote;
+        }
+        args << "--progress --delete-before";
     }
 
-    args << "--vfs-cache-mode"              << m_shared->cacheMode();
-    args << "--vfs-cache-max-size"          << QString::number(m_shared->cacheMaxSize())       + "G";
-    args << "--vfs-cache-min-free-space"    << QString::number(m_shared->cacheMinFreeSpace())  + "G";
-    args << "--vfs-cache-max-age"           << QString::number(m_shared->cacheMaxAge())        + "h";
-    args << "--vfs-read-chunk-size"         << QString::number(m_shared->readChunkSize())      + "M";
-    args << "--vfs-read-chunk-size-limit"   << QString::number(m_shared->readChunkSizeLimit()) + "M";
     args << "--buffer-size"                 << QString::number(m_shared->bufferSize())         + "M";
     args << "--transfers"                   << QString::number(m_shared->transfers());
     args << "--checkers"                    << QString::number(m_shared->checkers());
     if (m_shared->links()) args << "--links";
 
     // -v makes rclone write progress/errors to stderr (merged above)
-    //args << "-v";
-
     m_output.clear();
     m_output.append(args.join(' '));
 
@@ -107,7 +111,27 @@ void Job::stop()
 
     setStatus(JobStatus::Stopping);
 
-    m_process.terminate();
+    if (AttachConsole(m_process.processId())) {
+        SetConsoleCtrlHandler(nullptr, TRUE);   // suppress it in our process
+        GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0);
+        FreeConsole();
+        QTimer::singleShot(2000, this, [this]() {
+            m_process.write("Y\n");
+
+            QTimer::singleShot(3000, this, [this]() {
+                SetConsoleCtrlHandler(nullptr, FALSE);  // restore
+                if (m_process.state() != QProcess::NotRunning)
+                    m_process.kill();  // fallback
+            });
+        });
+
+
+    } else {
+        m_process.kill();
+    }
+
+
+
     // m_killTimer->start(5000);
 }
 
