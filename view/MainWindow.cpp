@@ -71,7 +71,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
 void MainWindow::loadSettingsToUi()
 {
     QSettings reg("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
-    bool isRegistered = reg.contains("SRCMG");
+    bool isRegistered = reg.contains(Config::APP_ID);
 
     const SharedSettings* s = m_manager.shared();
     ui->rclone            ->setText   (s->rclonePath());
@@ -109,9 +109,9 @@ void MainWindow::saveUiToSettings()
     // register or unregister startup
     QSettings reg("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     if(ui->startupLaunch->isChecked()){
-        reg.setValue("OneRClone_autostart", QCoreApplication::applicationFilePath().replace('/', '\\') + " --tray");
+        reg.setValue(Config::APP_ID, QCoreApplication::applicationFilePath().replace('/', '\\') + " --tray");
     }else{
-        reg.remove("OneRClone_autostart");
+        reg.remove(Config::APP_ID);
     }
 }
 

@@ -85,7 +85,7 @@ void Job::start(bool swapSides)
         }else{
             args << m_local << m_remote;
         }
-        args << "--progress --delete-before";
+        args << "--progress" << "--delete-before";
     }
 
     args << "--buffer-size"                 << QString::number(m_shared->bufferSize())         + "M";

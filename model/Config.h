@@ -6,8 +6,9 @@
 namespace Config {
 
     // Application info
-    inline constexpr char APP_NAME[]    = "OneClone";
-    inline constexpr char APP_VERSION[] = "0.1a";
+    inline constexpr char APP_NAME[]    = "OneRClone";
+    inline constexpr char APP_VERSION[] = "2.1";
+    inline constexpr char APP_ID[]      = "tk.duri.onerclone";
 
     // Settings file (resolved at runtime relative to exe)
     inline constexpr char SETTINGS_FILENAME[] = "settings.json";

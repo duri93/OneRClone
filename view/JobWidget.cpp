@@ -20,7 +20,6 @@ JobWidget::JobWidget(Job *job) : QWidget(nullptr), ui(new Ui::JobWidget) {
     installEventFilter(this);
 
     // connect events
-    connect(job, &Job::statusChanged,   this, &JobWidget::onStatusChange);
     connect(job, &Job::specsChanged,    this, &JobWidget::onSpecChange);
     connect(job, &Job::statusChanged,   this, &JobWidget::onStatusChange);
     connect(job, &Job::progressUpdated, this, &JobWidget::onProgress);

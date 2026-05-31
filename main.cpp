@@ -1,22 +1,21 @@
+#include "model/Config.h"
 #include "view/MainWindow.h"
 #include <QApplication>
 
 #include <QLocalServer>
 #include <QLocalSocket>
 
-static const char* INSTANCE_KEY = "SRCMG_SINGLE_INSTANCE";
-
 int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
-    app.setApplicationName("OneRClone");
-    app.setApplicationVersion("2.0");
-    app.setOrganizationName("OneRClone");
+    app.setApplicationName(Config::APP_NAME);
+    app.setApplicationVersion(Config::APP_VERSION);
+    app.setOrganizationName(Config::APP_NAME);
     app.setQuitOnLastWindowClosed(false);
 
     // Try to connect to an already-running instance
     QLocalSocket socket;
-    socket.connectToServer(INSTANCE_KEY);
+    socket.connectToServer(Config::APP_ID);
     if (socket.waitForConnected(500)) {
         // Another instance is running — tell it to show itself and exit
         socket.write("show");
@@ -27,8 +26,8 @@ int main(int argc, char* argv[])
 
     // No existing instance — become the server
     QLocalServer server;
-    QLocalServer::removeServer(INSTANCE_KEY); // clean up stale socket if crashed
-    server.listen(INSTANCE_KEY);
+    QLocalServer::removeServer(Config::APP_ID); // clean up stale socket if crashed
+    server.listen(Config::APP_ID);
 
     MainWindow window;
 
