@@ -97,7 +97,6 @@ void Job::start(bool swapSides)
     args << "--checkers"                    << QString::number(m_shared->checkers());
     if (m_shared->links()) args << "--links";
 
-    // -v makes rclone write progress/errors to stderr (merged above)
     m_output.clear();
     m_output.append(args.join(' '));
 

@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget* parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setWindowTitle(QString(Config::APP_NAME) + " " + Config::APP_VERSION);
     moveWindowToBottomRight();
 
     // ---- Load settings (generates defaults on first run) ----
@@ -303,7 +304,7 @@ void MainWindow::setupTray()
 
     // Placeholder icon — replace with your actual app icon
     m_trayIcon->setIcon(QIcon(":/resources/favicon.svg"));
-    m_trayIcon->setToolTip("OneRClone");
+    m_trayIcon->setToolTip(Config::APP_NAME);
 
     m_trayMenu  = new QMenu(this);
     m_trayOpen  = m_trayMenu->addAction("Open");

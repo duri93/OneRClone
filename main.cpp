@@ -33,8 +33,6 @@ int main(int argc, char* argv[])
     MainWindow window;
 
     // When a second instance connects, show the window
-
-
     QObject::connect(&server, &QLocalServer::newConnection, [&]() {
         QLocalSocket* conn = server.nextPendingConnection();
         QObject::connect(conn, &QLocalSocket::readyRead, [&window, conn]() {
