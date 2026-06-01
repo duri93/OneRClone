@@ -14,6 +14,7 @@ SharedSettings::SharedSettings(const QJsonObject& o){
     };
 
     this->m_rclonePath         = str("rclonePath",         this->rclonePath());
+    this->m_advanced           = log("advanced",           this->advanced());
     this->m_cacheMode          = str("cacheMode",          this->cacheMode());
     this->m_cacheMaxSize       = num("cacheMaxSize",       this->cacheMaxSize());
     this->m_cacheMinFreeSpace  = num("cacheMinFreeSpace",  this->cacheMinFreeSpace());
@@ -30,6 +31,7 @@ const QJsonObject SharedSettings::toJson() const{
     QJsonObject o;
 
     o["rclonePath"]         = this->rclonePath();
+    o["advanced"]           = this->advanced();
     o["cacheMode"]          = this->cacheMode();
     o["cacheMaxSize"]       = this->cacheMaxSize();
     o["cacheMinFreeSpace"]  = this->cacheMinFreeSpace();

@@ -7,6 +7,7 @@ class SharedSettings
 {
 public:
     const QString rclonePath()         const { return m_rclonePath;         };
+    const bool    advanced()           const { return m_advanced;           };
     const QString cacheMode()          const { return m_cacheMode;          };
     const int     cacheMaxSize()       const { return m_cacheMaxSize;       };
     const int     cacheMinFreeSpace()  const { return m_cacheMinFreeSpace;  };
@@ -19,6 +20,7 @@ public:
     const bool    links()              const { return m_links;              };
 
     void setRclonePath        (QString newRclonePath        ){ m_rclonePath         = std::move(newRclonePath); };
+    void setAdvanced          (bool    newAdvanced          ){ m_advanced           = newAdvanced;              };
     void setCacheMode         (QString newCacheMode         ){ m_cacheMode          = std::move(newCacheMode);  };
     void setCacheMaxSize      (int     newCacheMaxSize      ){ m_cacheMaxSize       = newCacheMaxSize;          };
     void setCacheMinFreeSpace (int     newCacheMinFreeSpace ){ m_cacheMinFreeSpace  = newCacheMinFreeSpace;     };
@@ -36,6 +38,7 @@ public:
     const QJsonObject toJson() const;
 private:
     QString m_rclonePath         = "C:\\RClone\\rclone.exe";
+    bool    m_advanced           = false;
     QString m_cacheMode          = "full";
     int     m_cacheMaxSize       = 50;    // GB
     int     m_cacheMinFreeSpace  = 50;    // GB

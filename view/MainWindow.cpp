@@ -34,7 +34,9 @@ MainWindow::MainWindow(QWidget* parent)
     }
 
     // ---- Settings tab ----
+    ui->advancedFrame->hide();
     loadSettingsToUi();
+    connect(ui->advanced, &QCheckBox::checkStateChanged, this, &MainWindow::onSettingsAdvanced);
     connect(ui->settings_save, &QPushButton::clicked, this, &MainWindow::onSettingsSave);
     connect(ui->rcloneSelect,  &QToolButton::clicked, this, &MainWindow::onRcloneSelectClicked);
 
@@ -79,6 +81,7 @@ void MainWindow::loadSettingsToUi()
 
     const SharedSettings* s = m_manager.shared();
     ui->rclone            ->setText   (s->rclonePath());
+    ui->advanced          ->setChecked(s->advanced());
     ui->bufferSize        ->setValue  (s->bufferSize());
     ui->cacheMaxSize      ->setValue  (s->cacheMaxSize());
     ui->cacheMinFreeSpace ->setValue  (s->cacheMinFreeSpace());
@@ -99,6 +102,7 @@ void MainWindow::saveUiToSettings()
 {
     SharedSettings* s = m_manager.shared();
     s->setRclonePath(ui->rclone->text());
+    s->setAdvanced(ui->advanced->isChecked());
     s->setCacheMode(ui->cacheMode->currentText());
     s->setCacheMaxSize(ui->cacheMaxSize->value());
     s->setCacheMinFreeSpace(ui->cacheMinFreeSpace->value());
@@ -128,7 +132,6 @@ void MainWindow::onSettingsSave()
     }else{
         statusBar()->showMessage("Error saving settings.", Config::STATUS_DURATION);
     }
-
 }
 void MainWindow::onRcloneSelectClicked()
 {
@@ -137,6 +140,13 @@ void MainWindow::onRcloneSelectClicked()
         "Executable (*.exe);;All files (*.*)");
     if (!path.isEmpty()) {
         ui->rclone->setText(QDir::toNativeSeparators(path));
+    }
+}
+void MainWindow::onSettingsAdvanced(){
+    if(ui->advanced->isChecked()){
+        ui->advancedFrame->show();
+    }else{
+        ui->advancedFrame->hide();
     }
 }
 
