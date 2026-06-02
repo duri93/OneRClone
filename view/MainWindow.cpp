@@ -342,17 +342,13 @@ void MainWindow::onTrayMenuAboutToShow()
     // Re-insert current service actions before lastSep
     for(JobWidget*& jw : m_jobWidgets){
         Job* job = jw->job();
-        QPixmap icon = QPixmap(jw->icon());
+        QPixmap icon = QPixmap(jw->statusIcon());
 
         QAction* act = new QAction(icon, job->name(), m_trayMenu);
 
         // Toggle on click
         connect(act, &QAction::triggered, this, [job]() {
-            if (job->status() == JobStatus::Running ||
-                job->status() == JobStatus::Starting)
-                job->stop();
-            else
-                job->start();
+            job->toggle();
         });
 
         m_trayMenu->insertAction(lastSep, act);

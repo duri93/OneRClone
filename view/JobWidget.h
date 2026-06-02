@@ -16,7 +16,8 @@ public:
     explicit JobWidget(Job* job);
     ~JobWidget() override;
 
-    const QString icon() const;
+    const QString jobIcon() const;
+    const QString statusIcon() const;
     Job*    job () { return m_job; };
     const Job*    job () const { return m_job; };
 

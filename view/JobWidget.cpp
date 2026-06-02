@@ -22,7 +22,6 @@ JobWidget::JobWidget(Job *job) : QWidget(nullptr), ui(new Ui::JobWidget) {
 
     // edit font size
     QFont small("Arial", Config::SMALL_FONT_SIZE);
-    ui->status ->setFont(small);
     ui->bytes  ->setFont(small);
     ui->speed  ->setFont(small);
     ui->percent->setFont(small);
@@ -43,8 +42,14 @@ JobWidget::JobWidget(Job *job) : QWidget(nullptr), ui(new Ui::JobWidget) {
 JobWidget::~JobWidget() {
     delete ui;
 }
-const QString JobWidget::icon() const{
-    QString str = QString(":/resources/icons/%1_%2.svg").arg(m_job->type(), m_job->statusString());
+const QString JobWidget::jobIcon() const{
+    QString str = QString(":/resources/icons/%1_%2.svg").arg(m_job->type(), m_job->active() ? "active" : "inactive");
+    str = str.toLower();
+
+    return str;
+}
+const QString JobWidget::statusIcon() const{
+    QString str = QString(":/resources/icons/%1.svg").arg(m_job->statusString());
     str = str.toLower();
 
     return str;
@@ -102,12 +107,14 @@ void JobWidget::onStatusChange(){
     bool active = m_job->active();
 
     // status label
-    QString str = "[" + m_job->statusString() + "]";
-    ui->status->setText(str);
+    //QString str = "[" + m_job->statusString() + "]";
+    //ui->status->setText(str);
+    QPixmap statusPx(statusIcon());
+    ui->statusIcon->setPixmap(statusPx.scaled(20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-    // status icon
-    QPixmap px(icon());
-    ui->icon->setPixmap(px.scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    // job icon
+    QPixmap jobPx(jobIcon());
+    ui->jobIcon->setPixmap(jobPx.scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     // button labels
     if(m_job->type() == "mount"){
@@ -166,6 +173,6 @@ void JobWidget::setProgressVisibility(){
         ui->eta->hide();
     }
 
-    adjustSize();
+    // adjustSize();
 }
 

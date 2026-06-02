@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="mount" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-1, .cls-2 {
+        stroke: #e6e7e8;
+        stroke-width: 2px;
+      }
+
+      .cls-2 {
+        fill: #e6e7e8;
+        stroke-linejoin: round;
+      }
+    </style>
+  </defs>
+  <circle class="cls-1" cx="20" cy="20" r="16"/>
+  <polygon class="cls-2" points="26 20 16 26 16 14 26 20 26 20"/>
+</svg>
