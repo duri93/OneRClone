@@ -83,12 +83,12 @@ private:
     void tryParseProgress(const QString& line);
 
     QString m_id;       // internal UUID, not shown in UI
-    QString m_name;
-    QString m_type;
-    QString m_local;
-    QString m_remote;
-    bool m_autostart = false;
-    bool m_readOnly = false;
+    QString m_name    = "New job";
+    QString m_type    = "sync";
+    QString m_local   = "";
+    QString m_remote  = "";
+    bool m_autostart  = false;
+    bool m_readOnly   = false;
 
     SharedSettings* m_shared;
     JobStatus       m_status = JobStatus::Stopped;
