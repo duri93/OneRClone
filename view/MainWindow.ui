@@ -74,7 +74,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabList">
        <attribute name="title">
@@ -425,7 +425,7 @@
         <item>
          <widget class="QCheckBox" name="startupLaunch">
           <property name="text">
-           <string>Launch on windows startup</string>
+           <string>Launch OneClone on Windows start up</string>
           </property>
          </widget>
         </item>
