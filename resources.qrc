@@ -19,5 +19,11 @@
         <file>resources/icons/sync_starting.svg</file>
         <file>resources/icons/sync_stopped.svg</file>
         <file>resources/icons/sync_stopping.svg</file>
+        <file>resources/icons/copy.svg</file>
+        <file>resources/icons/copy_success.svg</file>
+        <file>resources/icons/mount.svg</file>
+        <file>resources/icons/mount_success.svg</file>
+        <file>resources/icons/sync.svg</file>
+        <file>resources/icons/sync_success.svg</file>
     </qresource>
 </RCC>

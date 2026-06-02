@@ -57,7 +57,7 @@ const QString Job::statusString() const{
 // start / stop
 // ---------------------------------------------------------------------------
 void Job::toggle(bool swapSides){
-    if(m_status == JobStatus::Starting || m_status == JobStatus::Running){
+    if(active()){
         stop();
     }else{
         start(swapSides);
@@ -65,9 +65,7 @@ void Job::toggle(bool swapSides){
 }
 void Job::start(bool swapSides)
 {
-    if (m_status != JobStatus::Stopped && m_status != JobStatus::Errored) {
-        return;
-    }
+    if(active()) return;
 
     setStatus(JobStatus::Starting);
 
@@ -173,7 +171,7 @@ void Job::onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
     if (m_status == JobStatus::Errored) {
         // Process was stopped because of an error match — keep Errored status
-        setStatus(JobStatus::Errored);
+        //setStatus(JobStatus::Errored);
     } else if(m_status == JobStatus::Stopping){
         setStatus(JobStatus::Stopped);
     } else if (exitCode != 0 && exitCode != 62097) {
