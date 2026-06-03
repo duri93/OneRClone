@@ -17,12 +17,12 @@ Job::Job(SharedSettings* shared, QObject* parent)
 
     // Wire up process signals
     connect(&m_process, &QProcess::readyReadStandardOutput, this, &Job::onReadyRead);
-    connect(&m_process, &QProcess::readyReadStandardError, this, &Job::onReadyRead);
+    // connect(&m_process, &QProcess::readyReadStandardError, this, &Job::onReadyRead);
     connect(&m_process, &QProcess::errorOccurred, this, &Job::onProcessError);
     connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &Job::onProcessFinished);
 
     // Merge stderr into stdout channel for unified output display
-    // m_process.setProcessChannelMode(QProcess::MergedChannels);
+    m_process.setProcessChannelMode(QProcess::MergedChannels);
 }
 Job::~Job()
 {
@@ -212,7 +212,7 @@ void Job::processLine(const QString& line)
         processLineOutput(line);
     }else{
         static const QRegularExpression re(
-            QStringLiteral("^(?:Transferred|Errors|Checks|Elapsed time|Transferring)"),
+            QStringLiteral("^(?:Transferred|Errors|Checks|Elapsed time|Transferring|\\*\\s)"),
             QRegularExpression::CaseInsensitiveOption
         );
         if(re.match(line).hasMatch()){

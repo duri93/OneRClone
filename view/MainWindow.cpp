@@ -10,7 +10,7 @@
 #include <QListView>
 #include <QSettings>
 #include <QPainter>
-
+#include <QDir>
 #include <QRect>
 #include <QSize>
 #include <QScreen>
@@ -34,30 +34,43 @@ MainWindow::MainWindow(QWidget* parent)
         statusBar()->showMessage("Could not load settings file — using defaults.", Config::STATUS_DURATION);
     }
 
+    // ---- Errors ----
+    if(isRcloneInstalled()){
+        ui->errorRcloneFrame->hide();
+    }else{
+        ui->errorRcloneFrame->show();
+    }
+
+    if(isWinFspInstalled()){
+        ui->errorWinfspFrame->hide();
+    }else{
+        ui->errorWinfspFrame->show();
+    }
+
     // ---- Settings tab ----
-    ui->advancedFrame->hide();
+    ui->settingsAdvancedScrollarea->hide();
     loadSettingsToUi();
-    connect(ui->advanced, &QCheckBox::checkStateChanged, this, &MainWindow::onSettingsAdvanced);
-    connect(ui->settings_save, &QPushButton::clicked, this, &MainWindow::onSettingsSave);
-    connect(ui->rcloneSelect,  &QToolButton::clicked, this, &MainWindow::onRcloneSelectClicked);
+    connect(ui->settingsAdvanced, &QCheckBox::checkStateChanged, this, &MainWindow::onSettingsAdvanced);
+    connect(ui->settingsSave, &QPushButton::clicked, this, &MainWindow::onSettingsSave);
+    connect(ui->settingsRcloneButton,  &QToolButton::clicked, this, &MainWindow::onRcloneSelectClicked);
 
     // ---- List tab ----
     // populated when adding jobs
-    connect(ui->listAdd, &QPushButton::clicked, this, &MainWindow::onAddJobClicked);
+    connect(ui->jobsAdd, &QPushButton::clicked, this, &MainWindow::onAddJobClicked);
 
     connect(ui->jobsList, &JobListWidget::jobMoved, this, &MainWindow::onJobMoved);
 
     // ---- Details tab ----
-    ui->output->document()->setMaximumBlockCount(Config::MAX_OUTPUT_LINES);
+    ui->detailsOutput->document()->setMaximumBlockCount(Config::MAX_OUTPUT_LINES);
 
-    connect(ui->details_save,   &QPushButton::clicked, this, &MainWindow::onDetailsSave);
-    connect(ui->details_delete, &QPushButton::clicked, this, &MainWindow::onDetailsDelete);
-    connect(ui->localSelect,    &QToolButton::clicked, this, &MainWindow::onLocalSelectClicked);
+    connect(ui->detailsSave,   &QPushButton::clicked, this, &MainWindow::onDetailsSave);
+    connect(ui->detailsDelete, &QPushButton::clicked, this, &MainWindow::onDetailsDelete);
+    connect(ui->detailsLocalButton,    &QToolButton::clicked, this, &MainWindow::onLocalSelectClicked);
 
     // Start on the list tab
     clearDetails();
     openDetails(nullptr);
-    ui->tabWidget->setCurrentWidget(ui->tabList);
+    ui->tabWidget->setCurrentWidget(ui->tabJobs);
 
     // setup tray
     setupTray();
@@ -67,7 +80,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-
 void MainWindow::closeEvent(QCloseEvent* event)
 {
     hide();               // hide window, keep app running
@@ -83,43 +95,43 @@ void MainWindow::loadSettingsToUi()
     bool isRegistered = reg.contains(Config::APP_ID);
 
     const SharedSettings* s = m_manager.shared();
-    ui->rclone            ->setText   (s->rclonePath());
-    ui->advanced          ->setChecked(s->advanced());
-    ui->bufferSize        ->setValue  (s->bufferSize());
-    ui->cacheMaxSize      ->setValue  (s->cacheMaxSize());
-    ui->cacheMinFreeSpace ->setValue  (s->cacheMinFreeSpace());
-    ui->cacheMaxAge       ->setValue  (s->cacheMaxAge());
-    ui->readChunkSize     ->setValue  (s->readChunkSize());
-    ui->readChunkSizeLimit->setValue  (s->readChunkSizeLimit());
-    ui->transfers         ->setValue  (s->transfers());
-    ui->checkers          ->setValue  (s->checkers());
-    ui->links             ->setChecked(s->links());
-    ui->startupLaunch     ->setChecked(isRegistered);
+    ui->settingsRclone            ->setText   (s->rclonePath());
+    ui->settingsAdvanced          ->setChecked(s->advanced());
+    ui->settingsBufferSize        ->setValue  (s->bufferSize());
+    ui->settingsCacheMaxSize      ->setValue  (s->cacheMaxSize());
+    ui->settingsCacheMinFreeSpace ->setValue  (s->cacheMinFreeSpace());
+    ui->settingsCacheMaxAge       ->setValue  (s->cacheMaxAge());
+    ui->settingsReadChunkSize     ->setValue  (s->readChunkSize());
+    ui->settingsReadChunkSizeLimit->setValue  (s->readChunkSizeLimit());
+    ui->settingsTransfers         ->setValue  (s->transfers());
+    ui->settingsCheckers          ->setValue  (s->checkers());
+    ui->settingsLinks             ->setChecked(s->links());
+    ui->settingsAutostart         ->setChecked(isRegistered);
 
-    // cacheMode combobox: find matching text
-    int idx = ui->cacheMode->findText(s->cacheMode());
-    if (idx >= 0) ui->cacheMode->setCurrentIndex(idx);
+    // settingsCacheMode combobox: find matching text
+    int idx = ui->settingsCacheMode->findText(s->cacheMode());
+    if (idx >= 0) ui->settingsCacheMode->setCurrentIndex(idx);
 }
 
 void MainWindow::saveUiToSettings()
 {
     SharedSettings* s = m_manager.shared();
-    s->setRclonePath(ui->rclone->text());
-    s->setAdvanced(ui->advanced->isChecked());
-    s->setCacheMode(ui->cacheMode->currentText());
-    s->setCacheMaxSize(ui->cacheMaxSize->value());
-    s->setCacheMinFreeSpace(ui->cacheMinFreeSpace->value());
-    s->setCacheMaxAge(ui->cacheMaxAge->value());
-    s->setReadChunkSize(ui->readChunkSize->value());
-    s->setReadChunkSizeLimit(ui->readChunkSizeLimit->value());
-    s->setBufferSize(ui->bufferSize->value());
-    s->setTransfers(ui->transfers->value());
-    s->setCheckers(ui->checkers->value());
-    s->setLinks(ui->links->isChecked());
+    s->setRclonePath(ui->settingsRclone->text());
+    s->setAdvanced(ui->settingsAdvanced->isChecked());
+    s->setCacheMode(ui->settingsCacheMode->currentText());
+    s->setCacheMaxSize(ui->settingsCacheMaxSize->value());
+    s->setCacheMinFreeSpace(ui->settingsCacheMinFreeSpace->value());
+    s->setCacheMaxAge(ui->settingsCacheMaxAge->value());
+    s->setReadChunkSize(ui->settingsReadChunkSize->value());
+    s->setReadChunkSizeLimit(ui->settingsReadChunkSizeLimit->value());
+    s->setBufferSize(ui->settingsBufferSize->value());
+    s->setTransfers(ui->settingsTransfers->value());
+    s->setCheckers(ui->settingsCheckers->value());
+    s->setLinks(ui->settingsLinks->isChecked());
 
     // register or unregister startup
     QSettings reg("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
-    if(ui->startupLaunch->isChecked()){
+    if(ui->settingsAutostart->isChecked()){
         reg.setValue(Config::APP_ID, QCoreApplication::applicationFilePath().replace('/', '\\') + " --tray");
     }else{
         reg.remove(Config::APP_ID);
@@ -139,17 +151,17 @@ void MainWindow::onSettingsSave()
 void MainWindow::onRcloneSelectClicked()
 {
     QString path = QFileDialog::getOpenFileName(
-        this, "Select rclone.exe", ui->rclone->text(),
+        this, "Select rclone.exe", ui->settingsRclone->text(),
         "Executable (*.exe);;All files (*.*)");
     if (!path.isEmpty()) {
-        ui->rclone->setText(QDir::toNativeSeparators(path));
+        ui->settingsRclone->setText(QDir::toNativeSeparators(path));
     }
 }
 void MainWindow::onSettingsAdvanced(){
-    if(ui->advanced->isChecked()){
-        ui->advancedFrame->show();
+    if(ui->settingsAdvanced->isChecked()){
+        ui->settingsAdvancedScrollarea->show();
     }else{
-        ui->advancedFrame->hide();
+        ui->settingsAdvancedScrollarea->hide();
     }
 }
 
@@ -206,14 +218,14 @@ void MainWindow::openDetails(Job* job)
     // enable / disable panel
     bool validJob = (bool) job;
 
-    ui->name          ->setEnabled(validJob);
-    ui->type          ->setEnabled(validJob);
-    ui->local         ->setEnabled(validJob);
-    ui->remote        ->setEnabled(validJob);
-    ui->autostart     ->setEnabled(validJob);
-    ui->readOnly      ->setEnabled(validJob);
-    ui->details_save  ->setEnabled(validJob);
-    ui->details_delete->setEnabled(validJob);
+    ui->detailsName     ->setEnabled(validJob);
+    ui->detailsType     ->setEnabled(validJob);
+    ui->detailsLocal    ->setEnabled(validJob);
+    ui->detailsRemote   ->setEnabled(validJob);
+    ui->detailsAutostart->setEnabled(validJob);
+    ui->detailsReadOnly ->setEnabled(validJob);
+    ui->detailsSave     ->setEnabled(validJob);
+    ui->detailsDelete   ->setEnabled(validJob);
 
     if(!validJob) return;
 
@@ -221,17 +233,17 @@ void MainWindow::openDetails(Job* job)
     m_currentJobDetails = job;
 
     // update ui
-    ui->name->setText(job->name());
-    ui->type->setCurrentIndex(ui->type->findText(job->type()));
-    ui->local->setText(job->local());
-    ui->remote->setText(job->remote());
-    ui->autostart->setChecked(job->autostart());
-    ui->readOnly->setChecked(job->readOnly());
+    ui->detailsName->setText(job->name());
+    ui->detailsType->setCurrentIndex(ui->detailsType->findText(job->type()));
+    ui->detailsLocal->setText(job->local());
+    ui->detailsRemote->setText(job->remote());
+    ui->detailsAutostart->setChecked(job->autostart());
+    ui->detailsReadOnly->setChecked(job->readOnly());
 
     // populate output log
-    ui->output->clear();
+    ui->detailsOutput->clear();
     for(const QString& line : job->output()){
-        ui->output->append(line);
+        ui->detailsOutput->append(line);
     }
 
     // show details tab
@@ -242,12 +254,12 @@ void MainWindow::clearDetails()
 {
     m_currentJobDetails = nullptr;
 
-    ui->name->clear();
-    ui->local->clear();
-    ui->remote->clear();
-    ui->autostart->setChecked(false);
-    ui->readOnly->setChecked(false);
-    ui->output->clear();
+    ui->detailsName->clear();
+    ui->detailsLocal->clear();
+    ui->detailsRemote->clear();
+    ui->detailsAutostart->setChecked(false);
+    ui->detailsReadOnly->setChecked(false);
+    ui->detailsOutput->clear();
 }
 
 void MainWindow::onDetailsSave()
@@ -255,16 +267,16 @@ void MainWindow::onDetailsSave()
     if(!m_currentJobDetails) return;
     Job* job = m_currentJobDetails;
 
-    job->setName(ui->name->text());
-    job->setType(ui->type->currentText());
-    job->setLocal(ui->local->text());
-    job->setRemote(ui->remote->text());
-    job->setAutostart(ui->autostart->isChecked());
-    job->setReadOnly(ui->readOnly->isChecked());
+    job->setName(ui->detailsName->text());
+    job->setType(ui->detailsType->currentText());
+    job->setLocal(ui->detailsLocal->text());
+    job->setRemote(ui->detailsRemote->text());
+    job->setAutostart(ui->detailsAutostart->isChecked());
+    job->setReadOnly(ui->detailsReadOnly->isChecked());
 
     if(m_manager.save()){
         statusBar()->showMessage("Job saved.", Config::STATUS_DURATION);
-        ui->tabWidget->setCurrentWidget(ui->tabList);
+        ui->tabWidget->setCurrentWidget(ui->tabJobs);
     }else{
         statusBar()->showMessage("Error saving job.", Config::STATUS_DURATION);
     }
@@ -283,7 +295,7 @@ void MainWindow::onDetailsDelete()
 
         clearDetails();
         openDetails(nullptr);
-        ui->tabWidget->setCurrentWidget(ui->tabList);
+        ui->tabWidget->setCurrentWidget(ui->tabJobs);
     }else{
         statusBar()->showMessage("Error removing job.", Config::STATUS_DURATION);
     }
@@ -293,9 +305,9 @@ void MainWindow::onDetailsDelete()
 void MainWindow::onLocalSelectClicked()
 {
     QString path = QFileDialog::getExistingDirectory(
-        this, "Select local folder or mount point", ui->local->text());
+        this, "Select local folder or mount point", ui->detailsLocal->text());
     if (!path.isEmpty()) {
-        ui->local->setText(QDir::toNativeSeparators(path));
+        ui->detailsLocalButton->setText(QDir::toNativeSeparators(path));
     }
 }
 
@@ -307,7 +319,7 @@ void MainWindow::onJobOutputLine(const QString& id, const QString& line)
     // Only append to the output widget if the right service is in the details tab
     if (!m_currentJobDetails || id != m_currentJobDetails->id()) return;
 
-    ui->output->append(line);
+    ui->detailsOutput->append(line);
 
 }
 void MainWindow::onJobAdded(Job* job){
@@ -421,4 +433,37 @@ void MainWindow::activate(){
     setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
     raise();
     activateWindow();
+}
+
+// ---------------------------------------------------------------------------
+// General error messages
+// ---------------------------------------------------------------------------
+bool MainWindow::isRcloneInstalled(){
+    if(QDir(m_manager.shared()->rclonePath()).exists()){
+        return true;
+    }else{
+        return false;
+    }
+}
+bool MainWindow::isWinFspInstalled(){
+#ifdef Q_OS_WIN
+    // Method 1: Check registry
+    QSettings reg("HKEY_LOCAL_MACHINE\\SOFTWARE\\WinFsp", QSettings::NativeFormat);
+    if (!reg.allKeys().isEmpty()){
+        return true;
+    }
+
+    // Method 2: Check default install path
+    QStringList paths = {
+        "C:/Program Files (x86)/WinFsp",
+        "C:/Program Files/WinFsp"
+    };
+    for (const QString &path : paths) {
+        if (QDir(path).exists())
+            return true;
+    }
+    return false;
+#else
+    return false; // WinFsp is Windows-only
+#endif
 }

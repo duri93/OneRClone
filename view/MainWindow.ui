@@ -72,11 +72,141 @@
      </widget>
     </item>
     <item>
+     <widget class="QFrame" name="errorRcloneFrame">
+      <property name="frameShape">
+       <enum>QFrame::Shape::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Shadow::Raised</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <property name="spacing">
+        <number>16</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="errorRcloneIcon">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap resource="../resources.qrc">:/resources/icons/warning.svg</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignTop</set>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextInteractionFlag::NoTextInteraction</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="errorRcloneLabel">
+         <property name="frameShape">
+          <enum>QFrame::Shape::NoFrame</enum>
+         </property>
+         <property name="text">
+          <string>Cannot find RClone in the system. Ensure RClone is installed and its path is correct in the settings in order to be able to run jobs!</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <property name="indent">
+          <number>-1</number>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextInteractionFlag::NoTextInteraction</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QFrame" name="errorWinfspFrame">
+      <property name="frameShape">
+       <enum>QFrame::Shape::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Shadow::Raised</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <property name="spacing">
+        <number>12</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="errorWinfspIcon">
+         <property name="minimumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap resource="../resources.qrc">:/resources/icons/warning.svg</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="errorWinfspLabel">
+         <property name="frameShape">
+          <enum>QFrame::Shape::NoFrame</enum>
+         </property>
+         <property name="text">
+          <string>WinFSP doesn't seem to be installed in the system. Mount jobs will probably not work.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextInteractionFlag::NoTextInteraction</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>2</number>
       </property>
-      <widget class="QWidget" name="tabList">
+      <widget class="QWidget" name="tabJobs">
        <attribute name="title">
         <string>Jobs</string>
        </attribute>
@@ -104,7 +234,7 @@
              <x>0</x>
              <y>0</y>
              <width>454</width>
-             <height>329</height>
+             <height>253</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -130,7 +260,7 @@
              <number>0</number>
             </property>
             <item>
-             <spacer name="verticalSpacer_2">
+             <spacer name="jobsSpacer">
               <property name="orientation">
                <enum>Qt::Orientation::Vertical</enum>
               </property>
@@ -147,9 +277,9 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <layout class="QHBoxLayout" name="jobsButtonsLayout">
           <item>
-           <spacer name="horizontalSpacer_2">
+           <spacer name="jobsButtonsSpacer">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
@@ -162,7 +292,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="listAdd">
+           <widget class="QPushButton" name="jobsAdd">
             <property name="text">
              <string>Add</string>
             </property>
@@ -176,7 +306,7 @@
        <attribute name="title">
         <string>Job details</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <layout class="QFormLayout" name="formLayout">
         <property name="leftMargin">
          <number>4</number>
         </property>
@@ -189,165 +319,149 @@
         <property name="bottomMargin">
          <number>4</number>
         </property>
-        <item>
-         <layout class="QFormLayout" name="layout_details">
-          <property name="leftMargin">
+        <item row="0" column="0">
+         <widget class="QLabel" name="detailsNameLabel">
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="detailsName">
+          <property name="toolTip">
+           <string>Give a name for the job</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="detailsTypeLabel">
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="detailsType">
+          <property name="currentIndex">
            <number>0</number>
           </property>
-          <property name="topMargin">
-           <number>0</number>
+          <property name="maxVisibleItems">
+           <number>4</number>
           </property>
-          <property name="rightMargin">
-           <number>0</number>
+          <property name="maxCount">
+           <number>4</number>
           </property>
-          <property name="bottomMargin">
-           <number>0</number>
+          <item>
+           <property name="text">
+            <string>mount</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>sync</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>copy</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QCheckBox" name="detailsAutostart">
+          <property name="toolTip">
+           <string>If enabled, the job will run automatically when you open the app</string>
           </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_name">
-            <property name="text">
-             <string>Name</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="name">
+          <property name="text">
+           <string>Run automatically when app starts</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="Line" name="detailsLine1">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="detailsLocalLabel">
+          <property name="text">
+           <string>Local</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <layout class="QHBoxLayout" name="detailsLocalLayout">
+          <item>
+           <widget class="QLineEdit" name="detailsLocal">
             <property name="toolTip">
-             <string>Give a name for the job</string>
+             <string>Specify a folder, drive letter, or network mount path</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_type">
+          <item>
+           <widget class="QToolButton" name="detailsLocalButton">
             <property name="text">
-             <string>Type</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="type">
-            <property name="currentIndex">
-             <number>0</number>
-            </property>
-            <property name="maxVisibleItems">
-             <number>4</number>
-            </property>
-            <property name="maxCount">
-             <number>4</number>
-            </property>
-            <item>
-             <property name="text">
-              <string>mount</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>sync</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>copy</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QCheckBox" name="autostart">
-            <property name="toolTip">
-             <string>If enabled, the job will run automatically when you open the app</string>
-            </property>
-            <property name="text">
-             <string>Run automatically when app starts</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="2">
-           <widget class="Line" name="line">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_local">
-            <property name="text">
-             <string>Local</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <layout class="QHBoxLayout" name="layout_local">
-            <item>
-             <widget class="QLineEdit" name="local">
-              <property name="toolTip">
-               <string>Specify a folder, drive letter, or network mount path</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="localSelect">
-              <property name="text">
-               <string>...</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_remote">
-            <property name="text">
-             <string>Remote</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QLineEdit" name="remote">
-            <property name="toolTip">
-             <string>Specify the remote folder of the job (RClone needs to be set up correctly to work)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QCheckBox" name="readOnly">
-            <property name="toolTip">
-             <string>If enabled, the mounted folder will be read-only. Not relevant for sync jobs</string>
-            </property>
-            <property name="text">
-             <string>Read only</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0" colspan="2">
-           <widget class="Line" name="line_2">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="label_output">
-            <property name="text">
-             <string>Output</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QTextBrowser" name="output">
-            <property name="acceptRichText">
-             <bool>false</bool>
-            </property>
-            <property name="openLinks">
-             <bool>false</bool>
+             <string>...</string>
             </property>
            </widget>
           </item>
          </layout>
         </item>
-        <item>
-         <layout class="QHBoxLayout" name="layout_buttons" stretch="1,0,0">
+        <item row="5" column="0">
+         <widget class="QLabel" name="detailsRemoteLabel">
+          <property name="text">
+           <string>Remote</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLineEdit" name="detailsRemote">
+          <property name="toolTip">
+           <string>Specify the remote folder of the job (RClone needs to be set up correctly to work)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QCheckBox" name="detailsReadOnly">
+          <property name="toolTip">
+           <string>If enabled, the mounted folder will be read-only. Not relevant for sync jobs</string>
+          </property>
+          <property name="text">
+           <string>Read only</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="Line" name="detailsLine2">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0">
+         <widget class="QLabel" name="detailsOutputLabel">
+          <property name="text">
+           <string>Output</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1">
+         <widget class="QTextBrowser" name="detailsOutput">
+          <property name="acceptRichText">
+           <bool>false</bool>
+          </property>
+          <property name="openLinks">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <layout class="QHBoxLayout" name="detailsButtonsLayout" stretch="1,0,0">
           <item>
-           <spacer name="spacer_buttons">
+           <spacer name="detailsButtonsSpacer">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
@@ -360,14 +474,14 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="details_save">
+           <widget class="QPushButton" name="detailsSave">
             <property name="text">
              <string>Save</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="details_delete">
+           <widget class="QPushButton" name="detailsDelete">
             <property name="text">
              <string>Delete</string>
             </property>
@@ -395,16 +509,16 @@
          <number>4</number>
         </property>
         <item>
-         <layout class="QHBoxLayout" name="layout_rclone">
+         <layout class="QHBoxLayout" name="settingsRcloneLayout">
           <item>
-           <widget class="QLabel" name="label_rclone">
+           <widget class="QLabel" name="settingsRcloneLabel">
             <property name="text">
              <string>rclone.exe path</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="rclone">
+           <widget class="QLineEdit" name="settingsRclone">
             <property name="toolTip">
              <string>Path to the rclone executable</string>
             </property>
@@ -414,7 +528,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="rcloneSelect">
+           <widget class="QToolButton" name="settingsRcloneButton">
             <property name="text">
              <string>...</string>
             </property>
@@ -423,36 +537,201 @@
          </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="startupLaunch">
+         <widget class="QCheckBox" name="settingsAutostart">
           <property name="text">
            <string>Launch OneClone on Windows start up</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="advanced">
+         <widget class="QCheckBox" name="settingsAdvanced">
           <property name="text">
            <string>Show advanced settings</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QScrollArea" name="advancedFrame">
+         <widget class="QScrollArea" name="settingsAdvancedScrollarea">
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents">
+          <widget class="QWidget" name="settingsAdvancedLayout">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
              <width>444</width>
-             <height>255</height>
+             <height>259</height>
             </rect>
            </property>
            <layout class="QFormLayout" name="formLayout_2">
+            <item row="0" column="0">
+             <widget class="QLabel" name="settingsCacheModeLabel">
+              <property name="text">
+               <string>vfs-cache-mode</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QSpinBox" name="settingsCacheMaxSize">
+              <property name="suffix">
+               <string>G</string>
+              </property>
+              <property name="maximum">
+               <number>999999</number>
+              </property>
+              <property name="value">
+               <number>50</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="settingsCacheMaxSizeLabel">
+              <property name="text">
+               <string>vfs-cache-max-size</string>
+              </property>
+             </widget>
+            </item>
+            <item row="10" column="0">
+             <widget class="QCheckBox" name="settingsLinks">
+              <property name="text">
+               <string>enable symlinks</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="0">
+             <widget class="QLabel" name="settingsCheckersLabel">
+              <property name="text">
+               <string>checkers</string>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="1">
+             <widget class="QSpinBox" name="settingsCheckers">
+              <property name="value">
+               <number>16</number>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="0">
+             <widget class="QLabel" name="settingsTransfersLabel">
+              <property name="text">
+               <string>transfers</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QSpinBox" name="settingsTransfers">
+              <property name="value">
+               <number>16</number>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0">
+             <widget class="QLabel" name="settingsBufferSizeLabel">
+              <property name="text">
+               <string>buffer-size</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="1">
+             <widget class="QSpinBox" name="settingsBufferSize">
+              <property name="suffix">
+               <string>M</string>
+              </property>
+              <property name="maximum">
+               <number>999999</number>
+              </property>
+              <property name="value">
+               <number>256</number>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QLabel" name="settingsReadChunkSizeLimitLabel">
+              <property name="text">
+               <string>vfs-read-chunk-size-limit</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
+             <widget class="QSpinBox" name="settingsReadChunkSizeLimit">
+              <property name="suffix">
+               <string>M</string>
+              </property>
+              <property name="maximum">
+               <number>999999</number>
+              </property>
+              <property name="value">
+               <number>2048</number>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="settingsReadChunkSizeLabel">
+              <property name="text">
+               <string>vfs-read-chunk-size</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QSpinBox" name="settingsReadChunkSize">
+              <property name="suffix">
+               <string>M</string>
+              </property>
+              <property name="maximum">
+               <number>999999</number>
+              </property>
+              <property name="value">
+               <number>128</number>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="settingsCacheMaxAgeLabel">
+              <property name="text">
+               <string>vfs-cache-max-age</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QSpinBox" name="settingsCacheMaxAge">
+              <property name="suffix">
+               <string>h</string>
+              </property>
+              <property name="maximum">
+               <number>240</number>
+              </property>
+              <property name="value">
+               <number>24</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="settingsCacheMinFreeSpaceLabel">
+              <property name="text">
+               <string>vfs-cache-min-free-space</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QSpinBox" name="settingsCacheMinFreeSpace">
+              <property name="suffix">
+               <string>G</string>
+              </property>
+              <property name="maximum">
+               <number>999999</number>
+              </property>
+              <property name="value">
+               <number>50</number>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="cacheMode">
+             <widget class="QComboBox" name="settingsCacheMode">
               <property name="currentIndex">
                <number>3</number>
               </property>
@@ -478,177 +757,12 @@
               </item>
              </widget>
             </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_cacheMode">
-              <property name="text">
-               <string>vfs-cache-mode</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QSpinBox" name="cacheMaxSize">
-              <property name="suffix">
-               <string>G</string>
-              </property>
-              <property name="maximum">
-               <number>999999</number>
-              </property>
-              <property name="value">
-               <number>50</number>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_cacheMaxSize">
-              <property name="text">
-               <string>vfs-cache-max-size</string>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="0">
-             <widget class="QCheckBox" name="links">
-              <property name="text">
-               <string>enable symlinks</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="0">
-             <widget class="QLabel" name="label_checkers">
-              <property name="text">
-               <string>checkers</string>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="1">
-             <widget class="QSpinBox" name="checkers">
-              <property name="value">
-               <number>16</number>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="0">
-             <widget class="QLabel" name="label_transfers">
-              <property name="text">
-               <string>transfers</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="1">
-             <widget class="QSpinBox" name="transfers">
-              <property name="value">
-               <number>16</number>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="label_bufferSize">
-              <property name="text">
-               <string>buffer-size</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="1">
-             <widget class="QSpinBox" name="bufferSize">
-              <property name="suffix">
-               <string>M</string>
-              </property>
-              <property name="maximum">
-               <number>999999</number>
-              </property>
-              <property name="value">
-               <number>256</number>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="label_readChunkSizeLimit">
-              <property name="text">
-               <string>vfs-read-chunk-size-limit</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QSpinBox" name="readChunkSizeLimit">
-              <property name="suffix">
-               <string>M</string>
-              </property>
-              <property name="maximum">
-               <number>999999</number>
-              </property>
-              <property name="value">
-               <number>2048</number>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="label_readChunkSize">
-              <property name="text">
-               <string>vfs-read-chunk-size</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QSpinBox" name="readChunkSize">
-              <property name="suffix">
-               <string>M</string>
-              </property>
-              <property name="maximum">
-               <number>999999</number>
-              </property>
-              <property name="value">
-               <number>128</number>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_cacheMaxAge">
-              <property name="text">
-               <string>vfs-cache-max-age</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QSpinBox" name="cacheMaxAge">
-              <property name="suffix">
-               <string>h</string>
-              </property>
-              <property name="maximum">
-               <number>240</number>
-              </property>
-              <property name="value">
-               <number>24</number>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_cacheMinFreeSpace">
-              <property name="text">
-               <string>vfs-cache-min-free-space</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QSpinBox" name="cacheMinFreeSpace">
-              <property name="suffix">
-               <string>G</string>
-              </property>
-              <property name="maximum">
-               <number>999999</number>
-              </property>
-              <property name="value">
-               <number>50</number>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer">
+         <spacer name="settingsSpacer">
           <property name="orientation">
            <enum>Qt::Orientation::Vertical</enum>
           </property>
@@ -661,9 +775,9 @@
          </spacer>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
+         <layout class="QHBoxLayout" name="settingsNavLayout">
           <item>
-           <spacer name="horizontalSpacer">
+           <spacer name="settingsNavSpacer">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
@@ -676,7 +790,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="settings_save">
+           <widget class="QPushButton" name="settingsSave">
             <property name="text">
              <string>Save</string>
             </property>
@@ -704,7 +818,7 @@
          <number>4</number>
         </property>
         <item>
-         <widget class="QTextBrowser" name="textBrowser">
+         <widget class="QTextBrowser" name="helpText">
           <property name="html">
            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;

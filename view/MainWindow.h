@@ -79,6 +79,10 @@ private:
     // list
     JobWidget* findOrCreateJobWidget(Job* job);
 
+    // general error checkers
+    bool isRcloneInstalled();
+    bool isWinFspInstalled();
+
     // tray icon
     void setupTray();
 
