@@ -204,7 +204,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabJobs">
        <attribute name="title">
@@ -234,7 +234,7 @@
              <x>0</x>
              <y>0</y>
              <width>454</width>
-             <height>253</height>
+             <height>249</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -293,8 +293,58 @@
           </item>
           <item>
            <widget class="QPushButton" name="jobsAdd">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>Add</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="baseSize">
+             <size>
+              <width>32</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Open logs folder in windows explorer</string>
+            </property>
+            <property name="text">
+             <string>Log dir</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources.qrc">
+              <normaloff>:/resources/icons/logs.svg</normaloff>:/resources/icons/logs.svg</iconset>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -329,7 +379,7 @@
         <item row="0" column="1">
          <widget class="QLineEdit" name="detailsName">
           <property name="toolTip">
-           <string>Give a name for the job</string>
+           <string>Give a name to the job.</string>
           </property>
          </widget>
         </item>
@@ -342,6 +392,9 @@
         </item>
         <item row="1" column="1">
          <widget class="QComboBox" name="detailsType">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select job type:&lt;/p&gt;&lt;p&gt;- &lt;span style=&quot; font-weight:700;&quot;&gt;mount&lt;/span&gt;: connect the remote folder to this pc and access it like a normal folder;&lt;/p&gt;&lt;p&gt;- &lt;span style=&quot; font-weight:700;&quot;&gt;copy&lt;/span&gt;: copy files between two folders;&lt;/p&gt;&lt;p&gt;- &lt;span style=&quot; font-weight:700;&quot;&gt;sync&lt;/span&gt;: ensure two folders are exacly the same by copying new and modified files, and deleting files in the destination folder if they're not present in the source folder. This is often referred to as one-way synchronization.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="currentIndex">
            <number>0</number>
           </property>
@@ -371,7 +424,7 @@
         <item row="2" column="1">
          <widget class="QCheckBox" name="detailsAutostart">
           <property name="toolTip">
-           <string>If enabled, the job will run automatically when you open the app</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If enabled, the job will run automatically when you open the app.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>Run automatically when app starts</string>
@@ -397,7 +450,7 @@
           <item>
            <widget class="QLineEdit" name="detailsLocal">
             <property name="toolTip">
-             <string>Specify a folder, drive letter, or network mount path</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;For mount jobs, specify either:&lt;/p&gt;&lt;p&gt;- a local folder (should be empty), e.g., &amp;quot;C:\Users\Desktop\My Folder&amp;quot;)&lt;/p&gt;&lt;p&gt;- a drive letter (e.g., &amp;quot;E:\&amp;quot;)&lt;/p&gt;&lt;p&gt;- a network mount location (e.g., &amp;quot;\\allas\folder&amp;quot;)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;For copy and sync jobs, specify a folder in the local pc.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
@@ -420,14 +473,14 @@
         <item row="5" column="1">
          <widget class="QLineEdit" name="detailsRemote">
           <property name="toolTip">
-           <string>Specify the remote folder of the job (RClone needs to be set up correctly to work)</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the remote folder of the job, e.g., allas:folder&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;NOTE: RClone needs to be configured correctly to work with the remote.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
         <item row="6" column="1">
          <widget class="QCheckBox" name="detailsReadOnly">
           <property name="toolTip">
-           <string>If enabled, the mounted folder will be read-only. Not relevant for sync jobs</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If enabled, the mounted folder will be read-only&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;NOTE 1: this is for mount jobs only, not relevant for sync jobs.&lt;/p&gt;&lt;p&gt;NOTE 2: some programs like office may not work, as they need writing permissions just to open files.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>Read only</string>

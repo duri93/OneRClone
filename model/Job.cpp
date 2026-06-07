@@ -67,8 +67,6 @@ void Job::start(bool swapSides)
 {
     if(active()) return;
 
-    setStatus(JobStatus::Starting);
-
     QStringList args;
 
     if(m_type == "mount"){
@@ -95,6 +93,7 @@ void Job::start(bool swapSides)
     args << "--checkers"                    << QString::number(m_shared->checkers());
     if (m_shared->links()) args << "--links";
 
+    m_warnings.clear();
     m_output.clear();
     m_output.append(args.join(' '));
 
@@ -102,13 +101,14 @@ void Job::start(bool swapSides)
     m_process.setArguments(args);
     m_process.start();
 
+    setStatus(JobStatus::Starting);
+
     // QProcess::started is not connected here; we transition to Running on
     // first stdout output to avoid false positives while rclone initialises.
 }
-
 void Job::stop()
 {
-    if (m_status == JobStatus::Stopped) return;
+    if (!active()) return;
     setStatus(JobStatus::Stopping);
 
 #ifdef Q_OS_WIN
@@ -121,9 +121,6 @@ void Job::stop()
         FreeConsole();
 
         QTimer::singleShot(3000, this, [this]() {
-            if (--s_ctrlSuppressCount == 0){
-                SetConsoleCtrlHandler(nullptr, FALSE);  // restore
-            }
             if (m_process.state() != QProcess::NotRunning)
                 m_process.kill();  // fallback
         });
@@ -164,7 +161,13 @@ void Job::onProcessError(QProcess::ProcessError error)
 void Job::onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitStatus)
-    // m_killTimer->stop();
+
+#ifdef Q_OS_WIN
+    if (s_ctrlSuppressCount.load() > 0) {
+        if (--s_ctrlSuppressCount == 0)
+            SetConsoleCtrlHandler(nullptr, FALSE);
+    }
+#endif
 
     // Drain any remaining output
     onReadyRead();
@@ -174,7 +177,7 @@ void Job::onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
         //setStatus(JobStatus::Errored);
     } else if(m_status == JobStatus::Stopping){
         setStatus(JobStatus::Stopped);
-    } else if (exitCode != 0 && exitCode != 62097) {
+    } else if (exitCode != 0) {
         emit outputLine(m_id, QString("[ERROR] Process exited with code %1").arg(exitCode));
         setStatus(JobStatus::Errored);
     } else {
@@ -193,8 +196,6 @@ void Job::setStatus(JobStatus s)
 }
 void Job::processLine(const QString& line)
 {
-
-
     // Transition from Starting -> Running on first real output
     if (m_status == JobStatus::Starting) {
         if (m_type == "mount") {
@@ -222,11 +223,11 @@ void Job::processLine(const QString& line)
         }
     }
 
+    // TODO transform this to warning
     // Check for error pattern
-    if (Config::ERROR_REGEX.match(line).hasMatch()) {
-        setStatus(JobStatus::Errored);
-        m_process.terminate();
-        // m_killTimer->start(5000);
+    if (Config::WARNING_REGEX.match(line).hasMatch()) {
+        m_warnings.append(line);
+        emit warning(m_id, line);
         return;
     }
 }

@@ -57,7 +57,6 @@ MainWindow::MainWindow(QWidget* parent)
     // ---- List tab ----
     // populated when adding jobs
     connect(ui->jobsAdd, &QPushButton::clicked, this, &MainWindow::onAddJobClicked);
-
     connect(ui->jobsList, &JobListWidget::jobMoved, this, &MainWindow::onJobMoved);
 
     // ---- Details tab ----
@@ -198,7 +197,7 @@ void MainWindow::onJobMoved(const QString& id, int newIndex){
 }
 JobWidget* MainWindow::findOrCreateJobWidget(Job* job)
 {
-    for (JobWidget* w : m_jobWidgets)
+    for (JobWidget*& w : m_jobWidgets)
         if (w->job() == job) return w;
 
     // not found — create fresh (same as onJobAdded)
@@ -391,7 +390,7 @@ void MainWindow::onTrayMenuAboutToShow()
     // Re-insert current service actions before lastSep
     for(JobWidget*& jw : m_jobWidgets){
         Job* job = jw->job();
-        QPixmap icon = QPixmap(jw->statusIcon());
+        QPixmap icon = QPixmap(jw->getStatusIcon());
 
         QAction* act = new QAction(icon, job->name(), m_trayMenu);
 

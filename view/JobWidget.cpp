@@ -8,6 +8,8 @@
 #include <QFont>
 #include <QDrag>
 #include <QMimeData>
+#include <QPainter>
+#include <QSvgRenderer>
 
 // ---------------------------------------------------------------------------
 // Constructor and helpers
@@ -35,6 +37,7 @@ JobWidget::JobWidget(Job *job) : QWidget(nullptr), ui(new Ui::JobWidget) {
     connect(job, &Job::specsChanged,    this, &JobWidget::onSpecChange);
     connect(job, &Job::statusChanged,   this, &JobWidget::onStatusChange);
     connect(job, &Job::progressUpdated, this, &JobWidget::onProgress);
+    connect(job, &Job::warning,         this, &JobWidget::onWarning);
 
     connect(ui->button1, &QPushButton::clicked, this, [this]() {
         m_job->toggle(false);
@@ -46,18 +49,7 @@ JobWidget::JobWidget(Job *job) : QWidget(nullptr), ui(new Ui::JobWidget) {
 JobWidget::~JobWidget() {
     delete ui;
 }
-const QString JobWidget::jobIcon() const{
-    QString str = QString(":/resources/icons/%1_%2.svg").arg(m_job->type(), m_job->active() ? "active" : "inactive");
-    str = str.toLower();
 
-    return str;
-}
-const QString JobWidget::statusIcon() const{
-    QString str = QString(":/resources/icons/%1.svg").arg(m_job->statusString());
-    str = str.toLower();
-
-    return str;
-}
 
 // ---------------------------------------------------------------------------
 // Mouse events
@@ -99,11 +91,7 @@ void JobWidget::leaveEvent(QEvent* event)
 void JobWidget::onSpecChange(){
     ui->name->setText(m_job->name());
 
-    if(m_job->type() == "mount"){
-        ui->button2->hide();
-    }else{
-        ui->button2->show();
-    }
+    ui->button2->setVisible(m_job->type() != "mount");
 
     bool validType = m_job->type() != "";
     ui->button1->setEnabled(validType);
@@ -115,14 +103,8 @@ void JobWidget::onStatusChange(){
     bool active = m_job->active();
 
     // status label
-    //QString str = "[" + m_job->statusString() + "]";
-    //ui->status->setText(str);
-    QPixmap statusPx(statusIcon());
-    ui->statusIcon->setPixmap(statusPx.scaled(20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-
-    // job icon
-    QPixmap jobPx(jobIcon());
-    ui->jobIcon->setPixmap(jobPx.scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    ui->jobIcon->setPixmap(getJobIcon());
+    ui->statusIcon->setPixmap(getStatusIcon());
 
     // button labels
     if(m_job->type() == "mount"){
@@ -131,20 +113,12 @@ void JobWidget::onStatusChange(){
         ui->button1->setText(active ? "Stop" : "Copy ▲");
         ui->button2->setText(active ? "Stop" : "Copy ▼");
 
-        if(active){
-            ui->button2->hide();
-        }else{
-            ui->button2->show();
-        }
+        ui->button2->setVisible(!active);
     }else if(m_job->type() == "sync"){
         ui->button1->setText(active ? "Stop" : "Sync ▲");
         ui->button2->setText(active ? "Stop" : "Sync ▼");
 
-        if(active){
-            ui->button2->hide();
-        }else{
-            ui->button2->show();
-        }
+        ui->button2->setVisible(!active);
     }
 
     // show progress if copy/sync is running
@@ -157,6 +131,57 @@ void JobWidget::onProgress(){
     ui->eta->setText(m_job->progress().eta);
 
     ui->progress->setValue(m_job->progress().percent);
+}
+void JobWidget::onWarning(){
+
+    if(ui->statusIcon->toolTip().isEmpty()){
+         ui->statusIcon->setPixmap(getStatusIcon());
+    }
+
+    QString str = m_job->warnings().join("\n");
+
+    ui->statusIcon->setToolTip(str);
+}
+
+const QPixmap JobWidget::getJobIcon() const{
+    // svg resource
+    QString str = QString(":/resources/icons/%1_%2.svg")
+        .arg(m_job->type(), m_job->active() ? "active" : "inactive");
+    str = str.toLower();
+
+    // size
+    int h = ui->jobIcon->size().height();
+
+    // actually get
+    return QPixmap(str).scaled(h, h, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+}
+const QPixmap JobWidget::getStatusIcon() const{
+    int h = ui->statusIcon->size().height();
+
+    // base icon
+    QString baseIcon = QString(":/resources/icons/%1.svg").arg(m_job->statusString());
+    baseIcon = baseIcon.toLower();
+
+    QPixmap pixmap(baseIcon);
+    pixmap = pixmap.scaled(h, h, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    // warning badge
+    QString warnIcon = QString(":/resources/icons/warning.svg");
+    QSvgRenderer warnRenderer(warnIcon);
+
+    int warnSize = h / 3;
+
+    QRect warnRect(
+        h - warnSize,
+        h - warnSize,
+        warnSize,
+        warnSize);
+
+    QPainter painter(&pixmap);
+    warnRenderer.render(&painter, warnRect);
+
+    // set icon
+    return pixmap;
 }
 void JobWidget::setProgressVisibility(){
     bool active = m_job->active();
@@ -180,8 +205,6 @@ void JobWidget::setProgressVisibility(){
         ui->percent->hide();
         ui->eta->hide();
     }
-
-    // adjustSize();
 }
 
 // ---------------------------------------------------------------------------

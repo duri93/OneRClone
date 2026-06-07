@@ -16,8 +16,6 @@ public:
     explicit JobWidget(Job* job);
     ~JobWidget() override;
 
-    const QString jobIcon() const;
-    const QString statusIcon() const;
     Job*    job () { return m_job; };
     const Job*    job () const { return m_job; };
 
@@ -25,7 +23,10 @@ public:
     void onSpecChange();
     void onStatusChange();
     void onProgress();
-    void setProgressVisibility();
+    void onWarning();
+
+    const QPixmap getJobIcon() const;
+    const QPixmap getStatusIcon() const;
 
 signals:
     void openDetailsRequested(const QString& id);
@@ -35,6 +36,7 @@ private:
     Job*       m_job;
     QPoint m_dragStartPos;
 
+    void setProgressVisibility();
 protected:
     // TODO only from icon
     void mousePressEvent(QMouseEvent* event) override;

@@ -14,7 +14,6 @@ namespace Config {
     inline constexpr char SETTINGS_FILENAME[] = "settings.json";
 
     // Status detection: regex applied against rclone stdout
-    inline constexpr char DEFAULT_ERROR_REGEX[] = "NOTICE:.*failed|ERROR:";
     inline constexpr char DEFAULT_START_STRING[] = "The service rclone has been started.";
 
     // display
@@ -22,8 +21,8 @@ namespace Config {
     inline constexpr int MAX_OUTPUT_LINES = 2000;
     inline constexpr int SMALL_FONT_SIZE = 8;
 
-    inline const QRegularExpression ERROR_REGEX{
-        Config::DEFAULT_ERROR_REGEX
+    inline const QRegularExpression WARNING_REGEX{
+        "NOTICE:.*failed|ERROR:"
     };
 
 }

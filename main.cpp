@@ -35,14 +35,22 @@ int main(int argc, char* argv[])
     // When a second instance connects, show the window
     QObject::connect(&server, &QLocalServer::newConnection, [&]() {
         QLocalSocket* conn = server.nextPendingConnection();
-        QObject::connect(conn, &QLocalSocket::readyRead, [&window, conn]() {
-            conn->readAll();
-            window.activate();
+        auto fired = std::make_shared<bool>(false);
+
+        QObject::connect(conn, &QLocalSocket::readyRead, [&window, conn, &fired]() {
+            if (!*fired) {
+                *fired = true;
+                conn->readAll();
+                window.activate();
+            }
             conn->deleteLater();
         });
-        QTimer::singleShot(200, conn, [&window, conn]() {
+        QTimer::singleShot(200, conn, [&window, conn, fired]() {
             if (conn->bytesAvailable()) conn->readAll();
-            window.activate();
+            if (!*fired) {
+                *fired = true;
+                window.activate();
+            }
             conn->deleteLater();
         });
     });

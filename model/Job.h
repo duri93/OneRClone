@@ -52,10 +52,11 @@ public:
     void fromJson(const QJsonValue& json);
 
     // Status accessors
-    const QStringList   output()   const { return m_output; }
-    const JobStatus     status()   const { return m_status; }
-    const bool          active()   const { return m_status == JobStatus::Starting || m_status == JobStatus::Running; }
-    const JobProgress   progress() const { return m_progress; }
+    const QStringList      output()   const { return m_output; }
+    const JobStatus        status()   const { return m_status; }
+    const bool             active()   const { return m_status == JobStatus::Starting || m_status == JobStatus::Running; }
+    const JobProgress      progress() const { return m_progress; }
+    const QVector<QString> warnings() const { return m_warnings; }
 
     const QString       statusString() const;
 
@@ -68,8 +69,9 @@ public slots:
 
 signals:
     void specsChanged();
-    void statusChanged(const QString& serviceId, JobStatus& newStatus);
-    void progressUpdated(const QString& serviceId, JobProgress& newProgress);
+    void statusChanged(const QString& serviceId, const JobStatus& newStatus);
+    void warning(const QString& serviceId, const QString& line);
+    void progressUpdated(const QString& serviceId, const JobProgress& newProgress);
     void outputLine(const QString& serviceId, const QString& line);
 
 private slots:
@@ -93,6 +95,7 @@ private:
 
     SharedSettings* m_shared;
     JobStatus       m_status = JobStatus::Stopped;
+    QVector<QString> m_warnings;
     JobProgress     m_progress;
     QProcess        m_process;
     QStringList     m_output;
