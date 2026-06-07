@@ -32,7 +32,7 @@ Job::~Job()
     if (m_process.state() != QProcess::NotRunning) {
         m_status = JobStatus::Stopping;
         m_process.kill();
-        // m_process.waitForFinished(3000);
+        m_process.waitForFinished(1000);
     }
 }
 
@@ -69,6 +69,8 @@ void Job::start(bool swapSides)
 {
     if(active()) return;
 
+    logOpen();
+
     QStringList args;
 
     if(m_type == "mount"){
@@ -103,7 +105,7 @@ void Job::start(bool swapSides)
     m_process.setArguments(args);
     m_process.start();
 
-    logOpen();
+
 
     setStatus(JobStatus::Starting);
 
@@ -153,14 +155,16 @@ void Job::onReadyRead()
 void Job::onProcessError(QProcess::ProcessError error)
 {
     Q_UNUSED(error)
-    if (m_status != JobStatus::Stopping) {
-        if(error == QProcess::FailedToStart){
-            emit outputLine(m_id, QString("[ERROR] Failed to start: %1").arg(m_process.errorString()));
-        }else{
-            emit outputLine(m_id, QString("[ERROR] Process error: %1").arg(m_process.errorString()));
-        }
-        setStatus(JobStatus::Errored);
+    //if (m_status != JobStatus::Stopping) {
+    setStatus(JobStatus::Errored);
+
+    if(error == QProcess::FailedToStart){
+        emit outputLine(m_id, QString("[ERROR] Failed to start: %1").arg(m_process.errorString()));
+    }else{
+        emit outputLine(m_id, QString("[ERROR] Process error: %1").arg(m_process.errorString()));
     }
+
+    //}
 }
 void Job::onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
@@ -222,9 +226,11 @@ void Job::processLine(const QString& line)
             QStringLiteral("^(?:Transferred|Errors|Checks|Elapsed time|Transferring|\\*\\s)"),
             QRegularExpression::CaseInsensitiveOption
         );
+        bool wasProgress = false;
         if(re.match(line).hasMatch()){
-            processLineProgress(line);
-        }else{
+            wasProgress = processLineProgress(line);
+        }
+        if(!wasProgress){
             processLineOutput(line);
         }
     }
@@ -248,14 +254,14 @@ void Job::processLineOutput(const QString &line){
     logAppend(line);
     emit outputLine(m_id, line);
 }
-void Job::processLineProgress(const QString& line)
+bool Job::processLineProgress(const QString& line)
 {
     // Matches: "Transferred: 123.45 MiB / 1.23 GiB, 10%, 1.23 MiB/s, ETA 1m23s"
     static const QRegularExpression re(
         R"(Transferred:\s+([\d.]+ \S+ \/ [\d.]+ \S+),\s+(\d+)%,\s+([\S]+ \S+\/s),\s+ETA\s+(\S+))");
 
     QRegularExpressionMatch m = re.match(line);
-    if (!m.hasMatch()) return;
+    if (!m.hasMatch()) return false;
 
     // TODO: recognize as number and format number of significant digits?
     // TODO: limit refresh rate?
@@ -265,6 +271,7 @@ void Job::processLineProgress(const QString& line)
     m_progress.eta     = m.captured(4);   // e.g. "1m23s"
 
     emit progressUpdated(m_id, m_progress);
+    return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -299,9 +306,8 @@ void Job::logClose(){
     m_logfile.close();
 }
 void Job::openLogfile(){
-    if (m_logfile.fileName().isEmpty()) {
-        return;
-    }
+    if (m_logfile.fileName().isEmpty()) return;
+    if (!m_logfile.exists()) return;
 
     QDesktopServices::openUrl(
         QUrl::fromLocalFile(m_logfile.fileName())

@@ -101,6 +101,7 @@ bool Manager::load()
             if (v.isObject()) {
                 Job* job = new Job(m_shared.get());
                 job->fromJson(v);
+                if(job->autostart()) job->start();
                 addJob(job);
             }
         }

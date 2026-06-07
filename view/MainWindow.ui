@@ -204,7 +204,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabJobs">
        <attribute name="title">
@@ -826,6 +826,13 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Note: jobs that are currently running will keep old settings until stopped and restarted.</string>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="settingsNavLayout">

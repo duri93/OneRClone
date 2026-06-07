@@ -135,6 +135,9 @@ void MainWindow::saveUiToSettings()
     }else{
         reg.remove(Config::APP_ID);
     }
+
+    // check rclone again
+    ui->errorRcloneFrame->setVisible(isRcloneInstalled());
 }
 
 void MainWindow::onSettingsSave()
@@ -306,7 +309,7 @@ void MainWindow::onLocalSelectClicked()
     QString path = QFileDialog::getExistingDirectory(
         this, "Select local folder or mount point", ui->detailsLocal->text());
     if (!path.isEmpty()) {
-        ui->detailsLocalButton->setText(QDir::toNativeSeparators(path));
+        ui->detailsLocal->setText(QDir::toNativeSeparators(path));
     }
 }
 

@@ -86,7 +86,7 @@ private:
     void setStatus(JobStatus s);
     void processLine(const QString& line);
     void processLineOutput(const QString & line);
-    void processLineProgress(const QString& line);
+    bool processLineProgress(const QString& line);
 
     void logOpen();
     void logAppend(const QString& line);

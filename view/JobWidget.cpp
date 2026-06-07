@@ -127,6 +127,10 @@ void JobWidget::onStatusChange(){
         ui->button2->setVisible(!active);
     }
 
+    if(m_job->status == JobStatus::Starting){
+        ui->statusIcon->setToolTip("");
+    }
+
     // show progress if copy/sync is running
     setProgressVisibility();
 }
